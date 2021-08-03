@@ -11,7 +11,7 @@ using Azure.Storage.Blobs;
 using System.IO;
 using System.Text;
 
-namespace gwa_etl_dot_net
+namespace gwa_etl_dotnet
 {
     public class User
     {
