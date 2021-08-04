@@ -1,0 +1,9 @@
+[
+  { "name": "AW_DOMAIN", "value": "" },
+  { "name": "AW_TENANT_CODE", "value": "" },
+  { "name": "CERTIFICATE_PATH", "value": "/var/ssl/private/<cert-thumbprint>.p12" },
+  { "name": "DATA_EXTRACT_CONTAINER", "value": "data-extract" },
+  { "name": "DATA_EXTRACT_FILE_NAME", "value": "aw-users.json" },
+  { "name": "GWA_ETL_STORAGE_CONNECTION_STRING", "value": "" },
+  { "name": "WEBSITE_LOAD_CERTIFICATES", "value": "<cert-thumbprint>" }
+]
