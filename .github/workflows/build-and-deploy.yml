@@ -105,7 +105,7 @@ jobs:
         key: ${{ runner.os }}-sonar-scanner
         restore-keys: ${{ runner.os }}-sonar-scanner
     - name: Install SonarCloud scanner
-      if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+      if: ${{ steps.cache-sonar-scanner.outputs.cache-hit != 'true' }}
       shell: bash
       run: |
         mkdir -p ${{ env.SONAR_SCANNER_PATH }}
