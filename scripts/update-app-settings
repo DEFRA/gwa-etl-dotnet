@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# shellcheck disable=SC1091
+set -a; . .env; set +a
+
+# NOTE: Need to be logged in for this to work. Run `az login`.
+echo "Updating app-settings for function app '$FUNCTION_APP_NAME' in resource group '$RESOURCE_GROUP'"
+az functionapp config appsettings set --name "$FUNCTION_APP_NAME" --resource-group "$RESOURCE_GROUP" --settings "@app-settings.json"

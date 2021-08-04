@@ -64,14 +64,14 @@ namespace Defra.Gwa.Etl
         private static readonly HttpClient client = new();
         private static readonly string awDomain = Environment.GetEnvironmentVariable("AW_DOMAIN", EnvironmentVariableTarget.Process);
         private static readonly string awTenantCode = Environment.GetEnvironmentVariable("AW_TENANT_CODE", EnvironmentVariableTarget.Process);
-        private static readonly string certificatePassword = Environment.GetEnvironmentVariable("CERTIFICATE_PASSWORD", EnvironmentVariableTarget.Process);
-        private static readonly string certificatePath = Environment.GetEnvironmentVariable("CERTIFICATE_PATH", EnvironmentVariableTarget.Process);
         private static readonly string connectionString = Environment.GetEnvironmentVariable("GWA_ETL_STORAGE_CONNECTION_STRING", EnvironmentVariableTarget.Process);
         private static readonly string dataExtractContainer = Environment.GetEnvironmentVariable("DATA_EXTRACT_CONTAINER", EnvironmentVariableTarget.Process);
         private static readonly string dataExtractFileName = Environment.GetEnvironmentVariable("DATA_EXTRACT_FILE_NAME", EnvironmentVariableTarget.Process);
 
         private static string GetAuthHeader(UriBuilder baseUri)
         {
+            string certificatePassword = Environment.GetEnvironmentVariable("CERTIFICATE_PASSWORD", EnvironmentVariableTarget.Process);
+            string certificatePath = Environment.GetEnvironmentVariable("CERTIFICATE_PATH", EnvironmentVariableTarget.Process);
             X509Certificate2 certificate = new(certificatePath, certificatePassword);
             CmsSigner signer = new(certificate);
             _ = signer.SignedAttributes.Add(new Pkcs9SigningTime());
