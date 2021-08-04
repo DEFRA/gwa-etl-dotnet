@@ -10,6 +10,7 @@ env:
   AZURE_FUNCTIONAPP_NAME: 'gwa-etl-dotnet'
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'
   DOTNET_VERSION: '5.0.x'
+  DOTNET_VERSION_3: '3.1.x'
 
 jobs:
   build-and-deploy:
@@ -22,6 +23,11 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Setup .NET ${{ env.DOTNET_VERSION_3 }} Environment
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION_3 }}
 
     - name: Install Dependencies and Build
       shell: bash
@@ -51,6 +57,11 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Setup .NET ${{ env.DOTNET_VERSION_3 }} Environment
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION_3 }}
 
     - name: Super Lint Code Base
       uses: docker://ghcr.io/github/super-linter:v4
