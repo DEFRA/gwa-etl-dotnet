@@ -1,6 +1,6 @@
 # GWA ETL .NET
 
-[![Build and Deploy](https://github.com/DEFRA/gwa-etl-dotnet/actions/workflows/build-and-deploy-production.yml/badge.svg)](https://github.com/DEFRA/gwa-etl-dotnet/actions/workflows/build-and-deploy-production.yml)
+[![Build and Deploy](https://github.com/DEFRA/gwa-etl-dotnet/actions/workflows/build-and-deploy.yml/badge.svg)](https://github.com/DEFRA/gwa-etl-dotnet/actions/workflows/build-and-deploy.yml)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_gwa-etl-dotnet&metric=coverage)](https://sonarcloud.io/dashboard?id=DEFRA_gwa-etl-dotnet)
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_gwa-etl-dotnet&metric=sqale_index)](https://sonarcloud.io/dashboard?id=DEFRA_gwa-etl-dotnet)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_gwa-etl-dotnet&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=DEFRA_gwa-etl-dotnet)\
