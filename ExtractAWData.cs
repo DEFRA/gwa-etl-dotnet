@@ -63,15 +63,16 @@ namespace Defra.Gwa.Etl
     {
         private static readonly HttpClient client = new();
         private static readonly string awDomain = Environment.GetEnvironmentVariable("AW_DOMAIN", EnvironmentVariableTarget.Process);
-        private static readonly string awFileName = Environment.GetEnvironmentVariable("AW_FILE_NAME", EnvironmentVariableTarget.Process);
         private static readonly string awTenantCode = Environment.GetEnvironmentVariable("AW_TENANT_CODE", EnvironmentVariableTarget.Process);
-        private static readonly string container = Environment.GetEnvironmentVariable("DATA_EXTRACT_CONTAINER", EnvironmentVariableTarget.Process);
+        private static readonly string certificatePassword = Environment.GetEnvironmentVariable("CERTIFICATE_PASSWORD", EnvironmentVariableTarget.Process);
+        private static readonly string certificatePath = Environment.GetEnvironmentVariable("CERTIFICATE_PATH", EnvironmentVariableTarget.Process);
         private static readonly string connectionString = Environment.GetEnvironmentVariable("GWA_ETL_STORAGE_CONNECTION_STRING", EnvironmentVariableTarget.Process);
-        private static readonly string clientCertificatePassword = Environment.GetEnvironmentVariable("CERTIFICATE_PASSWORD", EnvironmentVariableTarget.Process);
+        private static readonly string dataExtractContainer = Environment.GetEnvironmentVariable("DATA_EXTRACT_CONTAINER", EnvironmentVariableTarget.Process);
+        private static readonly string dataExtractFileName = Environment.GetEnvironmentVariable("DATA_EXTRACT_FILE_NAME", EnvironmentVariableTarget.Process);
 
-        private static string GetAuthHeader (UriBuilder baseUri) {
-            string clientCertificatePath = @"../../Prod-CN=683_ReadOnlyAPI.p12";
-            X509Certificate2 certificate = new(clientCertificatePath, clientCertificatePassword);
+        private static string GetAuthHeader(UriBuilder baseUri)
+        {
+            X509Certificate2 certificate = new(certificatePath, certificatePassword);
             CmsSigner signer = new(certificate);
             _ = signer.SignedAttributes.Add(new Pkcs9SigningTime());
             byte[] signingData = Encoding.UTF8.GetBytes(baseUri.Path);
@@ -179,8 +180,8 @@ namespace Defra.Gwa.Etl
             } while (next);
 
             BlobServiceClient serviceClient = new(connectionString);
-            BlobContainerClient containerClient = serviceClient.GetBlobContainerClient(container);
-            BlobClient blobClient = containerClient.GetBlobClient(awFileName);
+            BlobContainerClient containerClient = serviceClient.GetBlobContainerClient(dataExtractContainer);
+            BlobClient blobClient = containerClient.GetBlobClient(dataExtractFileName);
             using (MemoryStream json = new(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(users.Values))))
             {
                 _ = await blobClient.UploadAsync(json, true);
