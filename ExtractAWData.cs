@@ -70,9 +70,8 @@ namespace Defra.Gwa.Etl
 
         private static string GetAuthHeader(UriBuilder baseUri)
         {
-            string certificatePassword = Environment.GetEnvironmentVariable("CERTIFICATE_PASSWORD", EnvironmentVariableTarget.Process);
             string certificatePath = Environment.GetEnvironmentVariable("CERTIFICATE_PATH", EnvironmentVariableTarget.Process);
-            X509Certificate2 certificate = new(certificatePath, certificatePassword);
+            X509Certificate2 certificate = new(certificatePath);
             CmsSigner signer = new(certificate);
             _ = signer.SignedAttributes.Add(new Pkcs9SigningTime());
             byte[] signingData = Encoding.UTF8.GetBytes(baseUri.Path);
