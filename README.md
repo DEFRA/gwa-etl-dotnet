@@ -6,7 +6,6 @@
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_gwa-etl-dotnet&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=DEFRA_gwa-etl-dotnet)\
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_gwa-etl-dotnet&metric=security_rating)](https://sonarcloud.io/dashboard?id=DEFRA_gwa-etl-dotnet)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_gwa-etl-dotnet&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=DEFRA_gwa-etl-dotnet)
-[![Known Vulnerabilities](https://snyk.io/test/github/defra/gwa-etl-dotnet/badge.svg)](https://snyk.io/test/github/defra/gwa-etl-dotnet)
 
 > An [Azure Function app](https://azure.microsoft.com/en-gb/services/functions/)
 > for retrieving data from AirWatch API.
