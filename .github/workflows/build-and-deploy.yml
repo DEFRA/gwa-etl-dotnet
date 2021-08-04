@@ -101,15 +101,15 @@ jobs:
       id: cache-sonar-scanner
       uses: actions/cache@v1
       with:
-        path: ${ env.SONAR_SCANNER_PATH }}
+        path: ${{ env.SONAR_SCANNER_PATH }}
         key: ${{ runner.os }}-sonar-scanner
         restore-keys: ${{ runner.os }}-sonar-scanner
     - name: Install SonarCloud scanner
       if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        mkdir -p ${ env.SONAR_SCANNER_PATH }}
-        dotnet tool update dotnet-sonarscanner --tool-path ${ env.SONAR_SCANNER_PATH }}
+        mkdir -p ${{ env.SONAR_SCANNER_PATH }}
+        dotnet tool update dotnet-sonarscanner --tool-path ${{ env.SONAR_SCANNER_PATH }}
     - name: Build and analyze
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
