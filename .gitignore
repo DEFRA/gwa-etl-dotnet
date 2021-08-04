@@ -265,3 +265,8 @@ __pycache__/
 
 # Certifcates
 *.p12
+
+# Environment
+.env
+env
+app-settings.json
