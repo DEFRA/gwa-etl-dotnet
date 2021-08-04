@@ -37,7 +37,7 @@ namespace Defra.Gwa.Etl
         public string UserEmailAddress { get; set; }
         public ModelId ModelId { get; set; }
     }
-    public class AirWatchAPIResponse
+    public class AirWatchApiResponse
     {
         public IList<Device> Devices { get; set; }
         public int Page { get; set; }
@@ -117,7 +117,7 @@ namespace Defra.Gwa.Etl
                 logger.LogInformation($"Response - {res}");
                 _ = res.EnsureSuccessStatusCode();
 
-                AirWatchAPIResponse responseData = await res.Content.ReadFromJsonAsync<AirWatchAPIResponse>();
+                AirWatchApiResponse responseData = await res.Content.ReadFromJsonAsync<AirWatchApiResponse>();
 
                 IList<Device> Devices = responseData.Devices;
                 int Page = responseData.Page;
