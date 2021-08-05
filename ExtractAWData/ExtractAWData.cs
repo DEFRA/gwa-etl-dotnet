@@ -13,33 +13,41 @@ using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Azure.Functions.Worker;
 using System.Globalization;
+using Microsoft.Extensions.Configuration;
 
 namespace Defra.Gwa.Etl
 {
     public class ExtractAWData
     {
-        private static readonly string awDomain = Environment.GetEnvironmentVariable("AW_DOMAIN", EnvironmentVariableTarget.Process);
-        private static readonly string awTenantCode = Environment.GetEnvironmentVariable("AW_TENANT_CODE", EnvironmentVariableTarget.Process);
         private static readonly string connectionString = Environment.GetEnvironmentVariable("GWA_ETL_STORAGE_CONNECTION_STRING", EnvironmentVariableTarget.Process);
         private static readonly string dataExtractContainer = Environment.GetEnvironmentVariable("DATA_EXTRACT_CONTAINER", EnvironmentVariableTarget.Process);
         private static readonly string dataExtractFileName = Environment.GetEnvironmentVariable("DATA_EXTRACT_FILE_NAME", EnvironmentVariableTarget.Process);
 
+        private readonly string authorizationHeader;
+        private readonly string awTenantCode;
+        private readonly UriBuilder baseUri;
         private readonly IHttpClientFactory httpClientFactory;
         private readonly ILogger<ExtractAWData> logger;
 
-        public ExtractAWData(IHttpClientFactory httpClientFactory, ILogger<ExtractAWData> logger)
+        public ExtractAWData(IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<ExtractAWData> logger)
         {
             this.httpClientFactory = httpClientFactory;
             this.logger = logger;
+
+            awTenantCode = configuration.GetValue<string>("AW_TENANT_CODE");
+
+            string awDomain = configuration.GetValue<string>("AW_DOMAIN");
+            baseUri = new($"https://{awDomain}/api/mdm/devices/search");
+            authorizationHeader = GetAuthHeader(baseUri.Path);
         }
 
-        private static string GetAuthHeader(UriBuilder baseUri)
+        private static string GetAuthHeader(string path)
         {
             string certificatePath = Environment.GetEnvironmentVariable("CERTIFICATE_PATH", EnvironmentVariableTarget.Process);
             X509Certificate2 certificate = new(certificatePath);
             CmsSigner signer = new(certificate);
             _ = signer.SignedAttributes.Add(new Pkcs9SigningTime());
-            byte[] signingData = Encoding.UTF8.GetBytes(baseUri.Path);
+            byte[] signingData = Encoding.UTF8.GetBytes(path);
             SignedCms signedCms = new(new ContentInfo(signingData), detached: true);
             signedCms.ComputeSignature(signer);
             byte[] signature = signedCms.Encode();
@@ -58,10 +66,6 @@ namespace Defra.Gwa.Etl
             int iPadCount = 0;
             int noEmailCount = 0;
             int noPhoneNumberCount = 0;
-
-            UriBuilder baseUri = new($"https://{awDomain}/api/mdm/devices/search");
-
-            string authorizationHeader = GetAuthHeader(baseUri);
 
             Dictionary<string, User> users = new();
             do
