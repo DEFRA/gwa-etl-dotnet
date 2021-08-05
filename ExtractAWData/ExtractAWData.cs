@@ -22,17 +22,17 @@ namespace Defra.Gwa.Etl
         private readonly string authorizationHeader;
         private readonly string awTenantCode;
         private readonly UriBuilder baseUri;
+        private readonly BlobClient blobClient;
         private readonly IHttpClientFactory httpClientFactory;
         private readonly ILogger<ExtractAWData> logger;
-        private readonly BlobClient blobClient;
 
         public ExtractAWData(BlobClient blobClient, IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<ExtractAWData> logger)
         {
+            awTenantCode = configuration.GetValue<string>("AW_TENANT_CODE");
+            this.blobClient = blobClient;
             this.httpClientFactory = httpClientFactory;
             this.logger = logger;
-            this.blobClient = blobClient;
 
-            awTenantCode = configuration.GetValue<string>("AW_TENANT_CODE");
 
             string awDomain = configuration.GetValue<string>("AW_DOMAIN");
             baseUri = new($"https://{awDomain}/api/mdm/devices/search");
@@ -59,7 +59,7 @@ namespace Defra.Gwa.Etl
 
             int pageSize = 500; // default is 500 prefer to be specific
             int page = 0; // zero based
-            bool next;
+            bool morePages;
             int deviceCount = 0;
             int iPadCount = 0;
             int noEmailCount = 0;
@@ -141,8 +141,8 @@ namespace Defra.Gwa.Etl
                     }
                 }
                 logger.LogInformation($"Processed {deviceCount} devices.");
-                next = page * pageSize < Total;
-            } while (next);
+                morePages = page * pageSize < Total;
+            } while (morePages);
 
             using (MemoryStream json = new(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(users.Values))))
             {
