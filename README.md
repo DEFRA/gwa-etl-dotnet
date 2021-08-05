@@ -37,8 +37,16 @@ the setup has been completed, specifically for
 
 ## Running Locally
 
-To start the function app run `func start`. Once the function is running it can
-be triggered by running [run-function-locally](./scripts/run-function-locally)
+To start the function app run navigate into the directory and start the
+function i.e.
+
+```bash
+cd ExtractAWData
+func start
+```
+
+Once the function is running it can be triggered by running
+[run-function-locally](./scripts/run-function-locally)
 and passing the name of the function i.e.
 `./scripts/run-function-locally ExtractAWData`.
 
