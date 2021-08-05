@@ -16,57 +16,20 @@ using System.Globalization;
 
 namespace Defra.Gwa.Etl
 {
-    public class User
+    public class ExtractAWData
     {
-        [JsonProperty("emailAddress")]
-        public string EmailAddress { get; set; }
-        [JsonProperty("phoneNumbers")]
-        public IList<string> PhoneNumbers { get; set; }
-    }
-    public class Id
-    {
-        public int Value { get; set; }
-    }
-    public class ModelId
-    {
-        public Id Id { get; set; }
-    }
-    public class Device
-    {
-        public string PhoneNumber { get; set; }
-        public string UserEmailAddress { get; set; }
-        public ModelId ModelId { get; set; }
-    }
-    public class AirWatchApiResponse
-    {
-        public IList<Device> Devices { get; set; }
-        public int Page { get; set; }
-        public int PageSize { get; set; }
-        public int Total { get; set; }
-    }
-
-    public class MyInfo
-    {
-        public MyScheduleStatus ScheduleStatus { get; set; }
-        public bool IsPastDue { get; set; }
-    }
-    public class MyScheduleStatus
-    {
-        public DateTime Last { get; set; }
-
-        public DateTime Next { get; set; }
-
-        public DateTime LastUpdated { get; set; }
-    }
-
-    public static class ExtractAWData
-    {
-        private static readonly HttpClient client = new();
         private static readonly string awDomain = Environment.GetEnvironmentVariable("AW_DOMAIN", EnvironmentVariableTarget.Process);
         private static readonly string awTenantCode = Environment.GetEnvironmentVariable("AW_TENANT_CODE", EnvironmentVariableTarget.Process);
         private static readonly string connectionString = Environment.GetEnvironmentVariable("GWA_ETL_STORAGE_CONNECTION_STRING", EnvironmentVariableTarget.Process);
         private static readonly string dataExtractContainer = Environment.GetEnvironmentVariable("DATA_EXTRACT_CONTAINER", EnvironmentVariableTarget.Process);
         private static readonly string dataExtractFileName = Environment.GetEnvironmentVariable("DATA_EXTRACT_FILE_NAME", EnvironmentVariableTarget.Process);
+
+        private readonly IHttpClientFactory httpClientFactory;
+
+        public ExtractAWData(IHttpClientFactory httpClientFactory)
+        {
+            this.httpClientFactory = httpClientFactory;
+        }
 
         private static string GetAuthHeader(UriBuilder baseUri)
         {
@@ -82,7 +45,7 @@ namespace Defra.Gwa.Etl
         }
 
         [Function("ExtractAWData")]
-        public static async Task Run(
+        public async Task Run(
             [TimerTrigger("0 0 8 * * 0")] MyInfo myTimer, FunctionContext context)
         {
             ILogger logger = context.GetLogger("ExtractAWData");
@@ -112,7 +75,8 @@ namespace Defra.Gwa.Etl
                 req.Headers.Add("aw-tenant-code", awTenantCode);
                 req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                HttpResponseMessage res = await client.SendAsync(req);
+                HttpClient httpClient = httpClientFactory.CreateClient();
+                HttpResponseMessage res = await httpClient.SendAsync(req);
                 logger.LogInformation($"Request - {res.RequestMessage}");
                 logger.LogInformation($"Response - {res}");
                 _ = res.EnsureSuccessStatusCode();
