@@ -1,38 +1,36 @@
+using Azure.Storage.Blobs;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Json;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using System.Net.Http.Headers;
-using Newtonsoft.Json;
-using Azure.Storage.Blobs;
+using System.Globalization;
 using System.IO;
-using System.Text;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
-using Microsoft.Azure.Functions.Worker;
-using System.Globalization;
-using Microsoft.Extensions.Configuration;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Defra.Gwa.Etl
 {
     public class ExtractAWData
     {
-        private static readonly string connectionString = Environment.GetEnvironmentVariable("GWA_ETL_STORAGE_CONNECTION_STRING", EnvironmentVariableTarget.Process);
-        private static readonly string dataExtractContainer = Environment.GetEnvironmentVariable("DATA_EXTRACT_CONTAINER", EnvironmentVariableTarget.Process);
-        private static readonly string dataExtractFileName = Environment.GetEnvironmentVariable("DATA_EXTRACT_FILE_NAME", EnvironmentVariableTarget.Process);
-
         private readonly string authorizationHeader;
         private readonly string awTenantCode;
         private readonly UriBuilder baseUri;
         private readonly IHttpClientFactory httpClientFactory;
         private readonly ILogger<ExtractAWData> logger;
+        private readonly BlobClient blobClient;
 
-        public ExtractAWData(IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<ExtractAWData> logger)
+        public ExtractAWData(BlobClient blobClient, IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<ExtractAWData> logger)
         {
             this.httpClientFactory = httpClientFactory;
             this.logger = logger;
+            this.blobClient = blobClient;
 
             awTenantCode = configuration.GetValue<string>("AW_TENANT_CODE");
 
@@ -146,9 +144,6 @@ namespace Defra.Gwa.Etl
                 next = page * pageSize < Total;
             } while (next);
 
-            BlobServiceClient serviceClient = new(connectionString);
-            BlobContainerClient containerClient = serviceClient.GetBlobContainerClient(dataExtractContainer);
-            BlobClient blobClient = containerClient.GetBlobClient(dataExtractFileName);
             using (MemoryStream json = new(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(users.Values))))
             {
                 _ = await blobClient.UploadAsync(json, true);
