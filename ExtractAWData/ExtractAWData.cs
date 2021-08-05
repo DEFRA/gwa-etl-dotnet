@@ -25,10 +25,12 @@ namespace Defra.Gwa.Etl
         private static readonly string dataExtractFileName = Environment.GetEnvironmentVariable("DATA_EXTRACT_FILE_NAME", EnvironmentVariableTarget.Process);
 
         private readonly IHttpClientFactory httpClientFactory;
+        private readonly ILogger<ExtractAWData> logger;
 
-        public ExtractAWData(IHttpClientFactory httpClientFactory)
+        public ExtractAWData(IHttpClientFactory httpClientFactory, ILogger<ExtractAWData> logger)
         {
             this.httpClientFactory = httpClientFactory;
+            this.logger = logger;
         }
 
         private static string GetAuthHeader(UriBuilder baseUri)
@@ -45,10 +47,8 @@ namespace Defra.Gwa.Etl
         }
 
         [Function("ExtractAWData")]
-        public async Task Run(
-            [TimerTrigger("0 0 8 * * 0")] MyInfo myTimer, FunctionContext context)
+        public async Task Run([TimerTrigger("0 0 8 * * 0")] MyInfo myTimer)
         {
-            ILogger logger = context.GetLogger("ExtractAWData");
             logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
             int pageSize = 500; // default is 500 prefer to be specific
