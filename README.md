@@ -35,10 +35,14 @@ The documentation within this repo assumes `CLI tools` are being used and
 the setup has been completed, specifically for
 [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
 
+## Testing
+
+Run the unit tests from the test directory with the command `dotnet test`.
+The tests can be run continuously using a file watcher via `dotnet watch test`.
+
 ## Running Locally
 
-To start the function app run navigate into the directory and start the
-function i.e.
+To start the function, navigate into the directory and start the function i.e.
 
 ```bash
 cd ExtractAWData
