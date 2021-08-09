@@ -62,10 +62,10 @@ namespace ExtractAWDataTests
             return SetupHttpClientFactory(httpClientFactoryMock, responseMessage);
         }
 
-        private static void VerifyLogError(Mock<ILogger<ExtractAWData>> loggerMock, string message)
+        private static void VerifyLog(Mock<ILogger<ExtractAWData>> loggerMock, LogLevel logLevel, string message)
         {
             loggerMock.Verify(logger => logger.Log(
-                LogLevel.Error,
+                It.Is<LogLevel>(level => level == logLevel),
                 It.IsAny<EventId>(),
                 It.Is<It.IsAnyType>((o, t) => o.ToString().Contains(message)),
                 It.IsAny<Exception>(),
@@ -73,15 +73,14 @@ namespace ExtractAWDataTests
             ));
         }
 
+        private static void VerifyLogError(Mock<ILogger<ExtractAWData>> loggerMock, string message)
+        {
+            VerifyLog(loggerMock, LogLevel.Error, message);
+        }
+
         private static void VerifyLogInformation(Mock<ILogger<ExtractAWData>> loggerMock, string message)
         {
-            loggerMock.Verify(logger => logger.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((o, t) => o.ToString().Contains(message)),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception, string>>()
-            ));
+            VerifyLog(loggerMock, LogLevel.Information, message);
         }
 
         [Fact]
