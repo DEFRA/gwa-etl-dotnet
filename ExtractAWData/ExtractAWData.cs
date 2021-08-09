@@ -35,13 +35,13 @@ namespace Defra.Gwa.Etl
 
 
             string awDomain = configuration.GetValue<string>("AW_DOMAIN");
+            string certificatePath = configuration.GetValue<string>("CERTIFICATE_PATH");
             baseUri = new($"https://{awDomain}/api/mdm/devices/search");
-            authorizationHeader = GetAuthHeader(baseUri.Path);
+            authorizationHeader = GetAuthHeader(baseUri.Path, certificatePath);
         }
 
-        private static string GetAuthHeader(string path)
+        private static string GetAuthHeader(string path, string certificatePath)
         {
-            string certificatePath = Environment.GetEnvironmentVariable("CERTIFICATE_PATH", EnvironmentVariableTarget.Process);
             X509Certificate2 certificate = new(certificatePath);
             CmsSigner signer = new(certificate);
             _ = signer.SignedAttributes.Add(new Pkcs9SigningTime());
