@@ -66,6 +66,13 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Run Tests
+      shell: bash
+      run: |
+        pushd "${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/Tests"
+        dotnet test --collect:"XPlat Code Coverage"
+        popd
+
   run-sonarcloud:
     runs-on: ubuntu-latest
     steps:
