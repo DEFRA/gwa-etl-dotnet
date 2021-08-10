@@ -20,7 +20,7 @@ using Xunit;
 
 namespace Gwa.Etl.Tests.Services
 {
-    public partial class AirWatchServiceTests
+    public class AirWatchServiceTests
     {
         private readonly IConfiguration configuration;
         private readonly Mock<IHttpClientFactory> httpClientFactoryMock = new();
