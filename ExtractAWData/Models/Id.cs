@@ -1,4 +1,4 @@
-namespace Defra.Gwa.Etl
+namespace Gwa.Etl.Models
 {
     public class Id
     {

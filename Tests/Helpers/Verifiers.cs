@@ -1,9 +1,10 @@
 using System;
-using Defra.Gwa.Etl;
+using Gwa.Etl;
+using Gwa.Etl.Tests.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace ExtractAWDataTests
+namespace Gwa.Etl.Tests.Helpers
 {
     public class Verifiers
     {

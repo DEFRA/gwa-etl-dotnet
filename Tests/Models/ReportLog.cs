@@ -1,4 +1,4 @@
-namespace ExtractAWDataTests
+namespace Gwa.Etl.Tests.Models
 {
     public class ReportLog
     {

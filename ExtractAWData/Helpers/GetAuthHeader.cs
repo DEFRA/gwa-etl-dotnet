@@ -3,7 +3,7 @@ using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-namespace Defra.Gwa.Etl
+namespace Gwa.Etl.Helpers
 {
     public class Authorization
     {

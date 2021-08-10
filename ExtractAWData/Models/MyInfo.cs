@@ -1,8 +1,8 @@
-namespace Defra.Gwa.Etl
+namespace Gwa.Etl.Models
 {
     public class MyInfo
     {
-        public MyScheduleStatus ScheduleStatus { get; set; }
         public bool IsPastDue { get; set; }
+        public MyScheduleStatus ScheduleStatus { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Defra.Gwa.Etl
+namespace Gwa.Etl.Models
 {
     public class AirWatchApiResponse
     {

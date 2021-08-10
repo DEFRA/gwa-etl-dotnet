@@ -1,11 +1,12 @@
 using Azure.Storage.Blobs;
-using Defra.Gwa.Etl;
+using Gwa.Etl.Models;
+using Gwa.Etl.Tests.Helpers;
+using Gwa.Etl.Tests.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -14,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace ExtractAWDataTests
+namespace Gwa.Etl.Tests
 {
     public class ExtractAWDataTest
     {

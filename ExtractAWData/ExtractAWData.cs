@@ -1,4 +1,6 @@
 using Azure.Storage.Blobs;
+using Gwa.Etl.Helpers;
+using Gwa.Etl.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -10,7 +12,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Defra.Gwa.Etl
+namespace Gwa.Etl
 {
     public class ExtractAWData
     {

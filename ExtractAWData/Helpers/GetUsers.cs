@@ -5,10 +5,11 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using Gwa.Etl.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Defra.Gwa.Etl
+namespace Gwa.Etl.Helpers
 {
     public class GetUsers
     {
