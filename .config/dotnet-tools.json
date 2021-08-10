@@ -7,6 +7,12 @@
       "commands": [
         "dotnet-dotcover"
       ]
+    },
+    "dotnet-sonarscanner": {
+      "version": "5.2.2",
+      "commands": [
+        "dotnet-sonarscanner"
+      ]
     }
   }
 }
