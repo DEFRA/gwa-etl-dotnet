@@ -38,30 +38,12 @@ namespace Gwa.Etl.Tests
             configuration = new ConfigurationBuilder().AddInMemoryCollection(config).Build();
         }
 
-        private static Mock<HttpMessageHandler> SetUpHttpMessageHandler(HttpResponseMessage responseMessage)
-        {
-            Mock<HttpMessageHandler> handlerMock = new(MockBehavior.Strict);
-            handlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(responseMessage)
-                .Verifiable();
-            return handlerMock;
-        }
-
-        private static IHttpClientFactory SetupHttpClientFactory(Mock<IHttpClientFactory> httpClientFactoryMock, Mock<HttpMessageHandler> handlerMock)
-        {
-            HttpClient httpClient = new(handlerMock.Object);
-            _ = httpClientFactoryMock.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
-            return httpClientFactoryMock.Object;
-        }
-
         [Fact]
         public async void UnsuccessfulStatusCodeThrowsAndLogsError()
         {
             HttpResponseMessage responseMessage = new() { StatusCode = HttpStatusCode.BadRequest };
-            Mock<HttpMessageHandler> handlerMock = SetUpHttpMessageHandler(responseMessage);
-            IHttpClientFactory httpClientFactory = SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
+            Mock<HttpMessageHandler> handlerMock = HttpSetup.SetUpHttpMessageHandler(responseMessage);
+            IHttpClientFactory httpClientFactory = HttpSetup.SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
 
             ExtractAWData extractAWData = new(blobClientMock.Object, configuration, httpClientFactory, loggerMock.Object);
             _ = await Assert.ThrowsAsync<HttpRequestException>(() => extractAWData.Run(null));
@@ -75,8 +57,8 @@ namespace Gwa.Etl.Tests
             AirWatchApiResponse apiResponse = new() { Devices = new List<Device>() };
             JObject json = (JObject)JToken.FromObject(apiResponse);
             HttpResponseMessage responseMessage = new() { StatusCode = HttpStatusCode.OK, Content = new StringContent(json.ToString()) };
-            Mock<HttpMessageHandler> handlerMock = SetUpHttpMessageHandler(responseMessage);
-            IHttpClientFactory httpClientFactory = SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
+            Mock<HttpMessageHandler> handlerMock = HttpSetup.SetUpHttpMessageHandler(responseMessage);
+            IHttpClientFactory httpClientFactory = HttpSetup.SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
 
             ExtractAWData extractAWData = new(blobClientMock.Object, configuration, httpClientFactory, loggerMock.Object);
             await extractAWData.Run(null);
@@ -90,7 +72,7 @@ namespace Gwa.Etl.Tests
         }
 
         [Fact]
-        public async void DevicesAreProcessed()
+        public async void DevicesReturnedLogsInformationAndUploadsData()
         {
             IList<Device> devices = new List<Device>()
             {
@@ -104,8 +86,8 @@ namespace Gwa.Etl.Tests
             AirWatchApiResponse apiResponse = new() { Devices = devices };
             JObject json = (JObject)JToken.FromObject(apiResponse);
             HttpResponseMessage responseMessage = new() { StatusCode = HttpStatusCode.OK, Content = new StringContent(json.ToString()) };
-            Mock<HttpMessageHandler> handlerMock = SetUpHttpMessageHandler(responseMessage);
-            IHttpClientFactory httpClientFactory = SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
+            Mock<HttpMessageHandler> handlerMock = HttpSetup.SetUpHttpMessageHandler(responseMessage);
+            IHttpClientFactory httpClientFactory = HttpSetup.SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
 
             ExtractAWData extractAWData = new(blobClientMock.Object, configuration, httpClientFactory, loggerMock.Object);
             await extractAWData.Run(null);

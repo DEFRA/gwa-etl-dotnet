@@ -1,17 +1,12 @@
-using Azure.Storage.Blobs;
 using Gwa.Etl.Models;
-using Gwa.Etl.Tests.Models;
+using Gwa.Etl.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Moq.Protected;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Gwa.Etl.Tests.Helpers
@@ -19,7 +14,6 @@ namespace Gwa.Etl.Tests.Helpers
     public class AirWatchServiceTests
     {
         private readonly IConfiguration configuration;
-        private readonly Mock<BlobClient> blobClientMock = new();
         private readonly Mock<IHttpClientFactory> httpClientFactoryMock = new();
         private readonly Mock<ILogger<ExtractAWData>> loggerMock = new();
 
@@ -37,59 +31,32 @@ namespace Gwa.Etl.Tests.Helpers
             configuration = new ConfigurationBuilder().AddInMemoryCollection(config).Build();
         }
 
-        private static Mock<HttpMessageHandler> SetUpHttpMessageHandler(HttpResponseMessage responseMessage)
-        {
-            Mock<HttpMessageHandler> handlerMock = new(MockBehavior.Strict);
-            handlerMock
-                .Protected()
-                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-                .ReturnsAsync(responseMessage)
-                .Verifiable();
-            return handlerMock;
-        }
-
-        private static IHttpClientFactory SetupHttpClientFactory(Mock<IHttpClientFactory> httpClientFactoryMock, Mock<HttpMessageHandler> handlerMock)
-        {
-            HttpClient httpClient = new(handlerMock.Object);
-            _ = httpClientFactoryMock.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
-            return httpClientFactoryMock.Object;
-        }
-
         [Fact]
-        public async void UnsuccessfulStatusCodeThrowsAndLogsError()
+        public async void UnsuccessfulStatusCodeThrows()
         {
             HttpResponseMessage responseMessage = new() { StatusCode = HttpStatusCode.BadRequest };
-            Mock<HttpMessageHandler> handlerMock = SetUpHttpMessageHandler(responseMessage);
-            IHttpClientFactory httpClientFactory = SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
+            Mock<HttpMessageHandler> handlerMock = HttpSetup.SetUpHttpMessageHandler(responseMessage);
+            IHttpClientFactory httpClientFactory = HttpSetup.SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
 
-            ExtractAWData extractAWData = new(blobClientMock.Object, configuration, httpClientFactory, loggerMock.Object);
-            _ = await Assert.ThrowsAsync<HttpRequestException>(() => extractAWData.Run(null));
-
-            Verifiers.VerifyLogError(loggerMock, "Response status code does not indicate success: 400 (Bad Request).");
+            AirWatchService airWatchService = new(configuration, httpClientFactory, loggerMock.Object);
+            _ = await Assert.ThrowsAsync<HttpRequestException>(() => airWatchService.Process());
         }
 
         [Fact]
-        public async void NoDevicesReturnedLogsInformation()
+        public async void NoDevicesReturnedReturnsNoDevices()
         {
             AirWatchApiResponse apiResponse = new() { Devices = new List<Device>() };
             JObject json = (JObject)JToken.FromObject(apiResponse);
             HttpResponseMessage responseMessage = new() { StatusCode = HttpStatusCode.OK, Content = new StringContent(json.ToString()) };
-            Mock<HttpMessageHandler> handlerMock = SetUpHttpMessageHandler(responseMessage);
-            IHttpClientFactory httpClientFactory = SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
+            Mock<HttpMessageHandler> handlerMock = HttpSetup.SetUpHttpMessageHandler(responseMessage);
+            IHttpClientFactory httpClientFactory = HttpSetup.SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
 
-            ExtractAWData extractAWData = new(blobClientMock.Object, configuration, httpClientFactory, loggerMock.Object);
-            await extractAWData.Run(null);
-
-            Verifiers.VerifyLogInfo(loggerMock, "C# Timer trigger function executed at:");
-            Verifiers.VerifyLogInfo(loggerMock, "Request - ");
-            Verifiers.VerifyLogInfo(loggerMock, "Response - StatusCode: 200, ReasonPhrase: 'OK', Version: 1.1, Content: System.Net.Http.StringContent");
-            Verifiers.VerifyLogInfo(loggerMock, "DeviceCount: 0");
-            Verifiers.VerifyLogInfo(loggerMock, "Page: 0\nPageSize: 0\nTotal: 0");
-            Verifiers.VerifyLogInfoReport(loggerMock, new ReportLog() { DevicesProcessed = 0, DevicesWithNoPhoneNumber = 0, DevicesWithNoUserEmailAddress = 0, DevicesWithUserEmailAddress = 0, IPads = 0 });
+            AirWatchService airWatchService = new(configuration, httpClientFactory, loggerMock.Object);
+            ProcessedUsers processedUsers = await airWatchService.Process();
         }
 
         [Fact]
-        public async void DevicesAreProcessed()
+        public async void DevicesAreProcessedAndReturned()
         {
             IList<Device> devices = new List<Device>()
             {
@@ -103,15 +70,11 @@ namespace Gwa.Etl.Tests.Helpers
             AirWatchApiResponse apiResponse = new() { Devices = devices };
             JObject json = (JObject)JToken.FromObject(apiResponse);
             HttpResponseMessage responseMessage = new() { StatusCode = HttpStatusCode.OK, Content = new StringContent(json.ToString()) };
-            Mock<HttpMessageHandler> handlerMock = SetUpHttpMessageHandler(responseMessage);
-            IHttpClientFactory httpClientFactory = SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
+            Mock<HttpMessageHandler> handlerMock = HttpSetup.SetUpHttpMessageHandler(responseMessage);
+            IHttpClientFactory httpClientFactory = HttpSetup.SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
 
-            ExtractAWData extractAWData = new(blobClientMock.Object, configuration, httpClientFactory, loggerMock.Object);
-            await extractAWData.Run(null);
-
-            Verifiers.VerifyLogInfoReport(loggerMock, new ReportLog() { DevicesProcessed = devices.Count, DevicesWithNoPhoneNumber = 1, DevicesWithNoUserEmailAddress = 1, DevicesWithUserEmailAddress = 3, IPads = 1 });
-
-            blobClientMock.Verify(x => x.UploadAsync(It.IsAny<MemoryStream>(), true, It.IsAny<CancellationToken>()));
+            AirWatchService airWatchService = new(configuration, httpClientFactory, loggerMock.Object);
+            ProcessedUsers processedUsers = await airWatchService.Process();
         }
     }
 }
