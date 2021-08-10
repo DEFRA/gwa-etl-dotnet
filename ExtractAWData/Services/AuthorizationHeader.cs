@@ -15,9 +15,9 @@ namespace Gwa.Etl.Services
             signer = new(certificate);
         }
 
-        public string GetAuthHeader(string path)
+        public string GetAuthHeader(string path, DateTime now)
         {
-            _ = signer.SignedAttributes.Add(new Pkcs9SigningTime());
+            _ = signer.SignedAttributes.Add(new Pkcs9SigningTime(now));
             byte[] signingData = Encoding.UTF8.GetBytes(path);
             SignedCms signedCms = new(new ContentInfo(signingData), detached: true);
             signedCms.ComputeSignature(signer);

@@ -29,7 +29,7 @@ namespace Gwa.Etl.Services
             string certificatePath = configuration.GetValue<string>("CERTIFICATE_PATH");
             string awDomain = configuration.GetValue<string>("AW_DOMAIN");
             UriBuilder baseUri = new($"https://{awDomain}/api/mdm/devices/search");
-            string authorizationHeader = new AuthorizationHeader(certificatePath).GetAuthHeader(baseUri.Path);
+            string authorizationHeader = new AuthorizationHeader(certificatePath).GetAuthHeader(baseUri.Path, DateTime.Now);
             string awTenantCode = configuration.GetValue<string>("AW_TENANT_CODE");
 
             int pageSize = 500; // default is 500 prefer to be specific
