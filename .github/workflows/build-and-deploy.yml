@@ -119,5 +119,5 @@ jobs:
       run: |
         ${{ env.SONAR_SCANNER_PATH }}/dotnet-sonarscanner begin /k:"DEFRA_gwa-etl-dotnet" /o:"defra" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
         dotnet build ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-        dotnet test ./Tests --collect:"XPlat Code Coverage"
+        dotnet test ./Tests /p:CollectCoverage=true /p:CoverletOutputFormatter=opencover
         ${{ env.SONAR_SCANNER_PATH }}/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
