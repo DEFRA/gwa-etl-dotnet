@@ -1,6 +1,7 @@
 using Azure.Storage.Blobs;
 using Gwa.Etl.Helpers;
 using Gwa.Etl.Models;
+using Gwa.Etl.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -36,7 +37,8 @@ namespace Gwa.Etl
             {
                 logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
 
-                ProcessedUsers processedUsers = await GetUsers.Process(configuration, httpClientFactory, logger);
+                AirWatchService getUsers = new(configuration, httpClientFactory, logger);
+                ProcessedUsers processedUsers = await getUsers.Process();
 
                 IDictionary<string, User> users = processedUsers.Users;
                 using (MemoryStream json = new(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(users.Values))))

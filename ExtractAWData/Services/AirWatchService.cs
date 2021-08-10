@@ -1,3 +1,7 @@
+using Gwa.Etl.Helpers;
+using Gwa.Etl.Models;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -5,15 +9,23 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Gwa.Etl.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
-namespace Gwa.Etl.Helpers
+namespace Gwa.Etl.Services
 {
-    public class GetUsers
+    public class AirWatchService
     {
-        public static async Task<ProcessedUsers> Process(IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger logger)
+        private readonly IConfiguration configuration;
+        private readonly IHttpClientFactory httpClientFactory;
+        private readonly ILogger<ExtractAWData> logger;
+
+        public AirWatchService(IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<ExtractAWData> logger)
+        {
+            this.configuration = configuration;
+            this.httpClientFactory = httpClientFactory;
+            this.logger = logger;
+        }
+
+        public async Task<ProcessedUsers> Process()
         {
             string certificatePath = configuration.GetValue<string>("CERTIFICATE_PATH");
             string awDomain = configuration.GetValue<string>("AW_DOMAIN");

@@ -1,6 +1,5 @@
 using Azure.Storage.Blobs;
 using Gwa.Etl.Models;
-using Gwa.Etl.Tests.Helpers;
 using Gwa.Etl.Tests.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -15,16 +14,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Gwa.Etl.Tests
+namespace Gwa.Etl.Tests.Helpers
 {
-    public class ExtractAWDataTest
+    public class AirWatchServiceTests
     {
         private readonly IConfiguration configuration;
         private readonly Mock<BlobClient> blobClientMock = new();
         private readonly Mock<IHttpClientFactory> httpClientFactoryMock = new();
         private readonly Mock<ILogger<ExtractAWData>> loggerMock = new();
 
-        public ExtractAWDataTest()
+        public AirWatchServiceTests()
         {
             IDictionary<string, string> config = new Dictionary<string, string>()
             {
