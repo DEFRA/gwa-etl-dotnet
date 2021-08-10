@@ -117,7 +117,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       shell: bash
       run: |
-        ${{ env.SONAR_SCANNER_PATH }}/dotnet-sonarscanner begin /k:"DEFRA_gwa-etl-dotnet" /o:"defra" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="**/*.trx"
+        ${{ env.SONAR_SCANNER_PATH }}/dotnet-sonarscanner begin /k:"DEFRA_gwa-etl-dotnet" /o:"defra" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.dotcover.reportsPaths="dotCover.Output.html"
         dotnet build ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-        dotnet test ./Tests --collect:"XPlat Code Coverage" --logger trx
+        dotnet dotnet-dotcover test --dcReportType=Html ./Tests
         ${{ env.SONAR_SCANNER_PATH }}/dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
