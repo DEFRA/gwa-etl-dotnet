@@ -3,14 +3,20 @@ using System.Security.Cryptography.Pkcs;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-namespace Gwa.Etl.Helpers
+namespace Gwa.Etl.Services
 {
-    public class Authorization
+    public class AuthorizationHeader
     {
-        public static string GetAuthHeader(string path, string certificatePath)
+        private readonly CmsSigner signer;
+
+        public AuthorizationHeader(string certificatePath)
         {
             X509Certificate2 certificate = new(certificatePath);
-            CmsSigner signer = new(certificate);
+            signer = new(certificate);
+        }
+
+        public string GetAuthHeader(string path)
+        {
             _ = signer.SignedAttributes.Add(new Pkcs9SigningTime());
             byte[] signingData = Encoding.UTF8.GetBytes(path);
             SignedCms signedCms = new(new ContentInfo(signingData), detached: true);

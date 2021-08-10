@@ -1,4 +1,3 @@
-using Gwa.Etl.Helpers;
 using Gwa.Etl.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -15,14 +14,14 @@ namespace Gwa.Etl.Services
     public class AirWatchService
     {
         private readonly IConfiguration configuration;
-        private readonly IHttpClientFactory httpClientFactory;
+        private readonly HttpClient httpClient;
         private readonly ILogger<ExtractAWData> logger;
 
         public AirWatchService(IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<ExtractAWData> logger)
         {
             this.configuration = configuration;
-            this.httpClientFactory = httpClientFactory;
             this.logger = logger;
+            httpClient = httpClientFactory.CreateClient();
         }
 
         public async Task<ProcessedUsers> Process()
@@ -30,7 +29,7 @@ namespace Gwa.Etl.Services
             string certificatePath = configuration.GetValue<string>("CERTIFICATE_PATH");
             string awDomain = configuration.GetValue<string>("AW_DOMAIN");
             UriBuilder baseUri = new($"https://{awDomain}/api/mdm/devices/search");
-            string authorizationHeader = Authorization.GetAuthHeader(baseUri.Path, certificatePath);
+            string authorizationHeader = new AuthorizationHeader(certificatePath).GetAuthHeader(baseUri.Path);
             string awTenantCode = configuration.GetValue<string>("AW_TENANT_CODE");
 
             int pageSize = 500; // default is 500 prefer to be specific
@@ -53,7 +52,6 @@ namespace Gwa.Etl.Services
                 req.Headers.Add("aw-tenant-code", awTenantCode);
                 req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                HttpClient httpClient = httpClientFactory.CreateClient();
                 HttpResponseMessage res = await httpClient.SendAsync(req);
                 logger.LogInformation($"Request - {res.RequestMessage}");
                 logger.LogInformation($"Response - {res}");
@@ -75,7 +73,7 @@ namespace Gwa.Etl.Services
                     Device device = Devices[i];
                     ModelId ModelId = device.ModelId;
                     string phoneNumber = device.PhoneNumber;
-                    string emailAddress = device.UserEmailAddress.ToLower(new CultureInfo("en-GB"));
+                    string emailAddress = device.UserEmailAddress?.ToLower(new CultureInfo("en-GB"));
 
                     if (ModelId.Id.Value == 2)
                     {
