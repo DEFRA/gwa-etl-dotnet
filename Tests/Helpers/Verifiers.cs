@@ -1,8 +1,7 @@
-using System;
-using Gwa.Etl;
 using Gwa.Etl.Tests.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
+using System;
 
 namespace Gwa.Etl.Tests.Helpers
 {
