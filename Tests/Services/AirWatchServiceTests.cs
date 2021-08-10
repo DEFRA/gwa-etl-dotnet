@@ -57,7 +57,7 @@ namespace Gwa.Etl.Tests.Services
         }
 
         [Fact]
-        public async void UnsuccessfulStatusCodeThrows()
+        public async Task UnsuccessfulStatusCodeThrows()
         {
             HttpResponseMessage responseMessage = new() { StatusCode = HttpStatusCode.BadRequest };
             Mock<HttpMessageHandler> handlerMock = HttpSetup.SetUpHttpMessageHandler(responseMessage, awDomain, awTenantCode);
@@ -68,7 +68,7 @@ namespace Gwa.Etl.Tests.Services
         }
 
         [Fact]
-        public async void NoDevicesReturnedReturnsNoDevices()
+        public async Task NoDevicesReturnedReturnsNoDevices()
         {
             IList<Device> devices = new List<Device>();
             AirWatchServiceTestSetup testSetup = SetupAirWatchService(devices);
@@ -88,7 +88,7 @@ namespace Gwa.Etl.Tests.Services
         }
 
         [Fact]
-        public async void IPadsAreIgnored()
+        public async Task IPadsAreIgnored()
         {
             string emailAddress = "user@gwa.com";
             IList<Device> devices = new List<Device>()
@@ -110,7 +110,7 @@ namespace Gwa.Etl.Tests.Services
         [InlineData(null)]
         [InlineData("")]
         [InlineData("   ")]
-        public async void DevicesWithNoEmailAddressAreCountedButNotReturned(string emailAddress)
+        public async Task DevicesWithNoEmailAddressAreCountedButNotReturned(string emailAddress)
         {
             IList<Device> devices = new List<Device>()
             {
@@ -128,7 +128,7 @@ namespace Gwa.Etl.Tests.Services
         }
 
         [Fact]
-        public async void UsersWithMultiplePhoneNumbersAreReturnedAsSuch()
+        public async Task UsersWithMultiplePhoneNumbersAreReturnedAsSuch()
         {
             string emailAddress = "user@gwa.com";
             IList<Device> devices = new List<Device>()
@@ -152,7 +152,7 @@ namespace Gwa.Etl.Tests.Services
         }
 
         [Fact]
-        public async void UsersWithNoPhoneNumbersAreReturnedAsSuch()
+        public async Task UsersWithNoPhoneNumbersAreReturnedAsSuch()
         {
             string emailAddress = "user@gwa.com";
             IList<Device> devices = new List<Device>()
@@ -177,7 +177,7 @@ namespace Gwa.Etl.Tests.Services
         [InlineData("UPPER@GWA.COM")]
         [InlineData("lower@gwa.com")]
         [InlineData("MiXeD@GwA.cOm")]
-        public async void EmailAddressesAreLowerCased(string emailAddress)
+        public async Task EmailAddressesAreLowerCased(string emailAddress)
         {
             string lowerEmail = emailAddress.ToLower(new CultureInfo("en-GB"));
             IList<Device> devices = new List<Device>()
@@ -197,7 +197,7 @@ namespace Gwa.Etl.Tests.Services
         }
 
         [Fact]
-        public async void Over500DevicesReturnedResultsInAdditionalRequests()
+        public async Task Over500DevicesReturnedResultsInAdditionalRequests()
         {
             string emailAddress = "test@gwa.com";
             IList<Device> devices = new List<Device>()

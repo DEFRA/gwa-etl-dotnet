@@ -11,6 +11,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Gwa.Etl.Tests
@@ -39,7 +40,7 @@ namespace Gwa.Etl.Tests
         }
 
         [Fact]
-        public async void UnsuccessfulStatusCodeThrowsAndLogsError()
+        public async Task UnsuccessfulStatusCodeThrowsAndLogsError()
         {
             HttpResponseMessage responseMessage = new() { StatusCode = HttpStatusCode.BadRequest };
             Mock<HttpMessageHandler> handlerMock = HttpSetup.SetUpHttpMessageHandler(responseMessage, awDomain, awTenantCode);
@@ -52,7 +53,7 @@ namespace Gwa.Etl.Tests
         }
 
         [Fact]
-        public async void NoDevicesReturnedLogsInformation()
+        public async Task NoDevicesReturnedLogsInformation()
         {
             AirWatchApiResponse apiResponse = new() { Devices = new List<Device>() };
             JObject json = (JObject)JToken.FromObject(apiResponse);
@@ -72,7 +73,7 @@ namespace Gwa.Etl.Tests
         }
 
         [Fact]
-        public async void DevicesReturnedLogsInformationAndUploadsData()
+        public async Task DevicesReturnedLogsInformationAndUploadsData()
         {
             IList<Device> devices = new List<Device>()
             {
