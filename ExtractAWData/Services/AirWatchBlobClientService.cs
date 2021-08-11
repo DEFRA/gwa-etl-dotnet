@@ -1,4 +1,5 @@
 using Azure.Storage.Blobs;
+using System;
 
 namespace Gwa.Etl.Services
 {
@@ -8,11 +9,11 @@ namespace Gwa.Etl.Services
         private readonly string container;
         private readonly string filename;
 
-        public AirWatchBlobClientService(string connectionString, string container, string filename)
+        public AirWatchBlobClientService()
         {
-            this.connectionString = connectionString;
-            this.container = container;
-            this.filename = filename;
+            connectionString = Environment.GetEnvironmentVariable("GWA_ETL_STORAGE_CONNECTION_STRING", EnvironmentVariableTarget.Process);
+            container = Environment.GetEnvironmentVariable("DATA_EXTRACT_CONTAINER", EnvironmentVariableTarget.Process);
+            filename = Environment.GetEnvironmentVariable("DATA_EXTRACT_FILE_NAME", EnvironmentVariableTarget.Process);
         }
 
         public BlobClient CreateBlobClient()

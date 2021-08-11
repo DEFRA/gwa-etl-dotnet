@@ -3,7 +3,6 @@ using Gwa.Etl.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 
 namespace Gwa.Etl
 {
@@ -11,11 +10,7 @@ namespace Gwa.Etl
     {
         public static void Main()
         {
-            string connectionString = Environment.GetEnvironmentVariable("GWA_ETL_STORAGE_CONNECTION_STRING", EnvironmentVariableTarget.Process);
-            string dataExtractContainer = Environment.GetEnvironmentVariable("DATA_EXTRACT_CONTAINER", EnvironmentVariableTarget.Process);
-            string dataExtractFileName = Environment.GetEnvironmentVariable("DATA_EXTRACT_FILE_NAME", EnvironmentVariableTarget.Process);
-
-            AirWatchBlobClientService airWatchBlobClientService = new(connectionString, dataExtractContainer, dataExtractFileName);
+            AirWatchBlobClientService airWatchBlobClientService = new();
             BlobClient blobClient = airWatchBlobClientService.CreateBlobClient();
 
             IHost host = new HostBuilder()
