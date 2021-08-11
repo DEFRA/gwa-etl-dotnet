@@ -5,7 +5,6 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
@@ -30,12 +29,12 @@ namespace Gwa.Etl
         }
 
         [Function("ExtractAWData")]
-        public async Task Run([TimerTrigger("0 0 8 * * 0")] MyInfo myTimer)
+        public async Task Run([TimerTrigger("0 0 8 * * 0")] MyTimerInfo timerInfo)
         {
             try
             {
-                logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}.");
-                logger.LogInformation($"Next execution will be at {myTimer.ScheduleStatus.Next}");
+                logger.LogInformation($"C# Timer trigger function executed at: {timerInfo.ScheduleStatus.LastUpdated}.");
+                logger.LogInformation($"Last execution was at {timerInfo.ScheduleStatus.Last}. Next execution will be at {timerInfo.ScheduleStatus.Next}");
 
                 AirWatchService getUsers = new(configuration, httpClientFactory, logger);
                 ProcessedUsers processedUsers = await getUsers.Process();

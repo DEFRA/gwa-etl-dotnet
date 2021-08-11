@@ -1,8 +1,7 @@
 namespace Gwa.Etl.Models
 {
-    public class MyInfo
+    public class MyTimerInfo
     {
-        public bool IsPastDue { get; set; }
         public MyScheduleStatus ScheduleStatus { get; set; }
     }
 }
