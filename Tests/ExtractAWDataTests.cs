@@ -6,7 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -24,6 +26,7 @@ namespace Gwa.Etl.Tests
         private readonly Mock<ILogger<ExtractAWData>> loggerMock = new();
         private readonly string awDomain = "fake.domain";
         private readonly string awTenantCode = "AW_TENANT_CODE";
+        private readonly MyInfo info = new() { ScheduleStatus = new() { Next = DateTime.Parse("2020-02-02T12:34:56-0:00", new CultureInfo("en-GB")) } };
 
         public ExtractAWDataTests()
         {
@@ -47,7 +50,7 @@ namespace Gwa.Etl.Tests
             IHttpClientFactory httpClientFactory = HttpSetup.SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
 
             ExtractAWData extractAWData = new(blobClientMock.Object, configuration, httpClientFactory, loggerMock.Object);
-            _ = await Assert.ThrowsAsync<HttpRequestException>(() => extractAWData.Run(null));
+            _ = await Assert.ThrowsAsync<HttpRequestException>(() => extractAWData.Run(info));
 
             Verifiers.VerifyLogError(loggerMock, "Response status code does not indicate success: 400 (Bad Request).");
         }
@@ -62,9 +65,10 @@ namespace Gwa.Etl.Tests
             IHttpClientFactory httpClientFactory = HttpSetup.SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
 
             ExtractAWData extractAWData = new(blobClientMock.Object, configuration, httpClientFactory, loggerMock.Object);
-            await extractAWData.Run(null);
+            await extractAWData.Run(info);
 
             Verifiers.VerifyLogInfo(loggerMock, "C# Timer trigger function executed at:");
+            Verifiers.VerifyLogInfo(loggerMock, $"Next execution will be at {info.ScheduleStatus.Next}");
             Verifiers.VerifyLogInfo(loggerMock, "Request - ");
             Verifiers.VerifyLogInfo(loggerMock, "Response - StatusCode: 200, ReasonPhrase: 'OK', Version: 1.1, Content: System.Net.Http.StringContent");
             Verifiers.VerifyLogInfo(loggerMock, "DeviceCount: 0");
@@ -91,7 +95,7 @@ namespace Gwa.Etl.Tests
             IHttpClientFactory httpClientFactory = HttpSetup.SetupHttpClientFactory(httpClientFactoryMock, handlerMock);
 
             ExtractAWData extractAWData = new(blobClientMock.Object, configuration, httpClientFactory, loggerMock.Object);
-            await extractAWData.Run(null);
+            await extractAWData.Run(info);
 
             Verifiers.VerifyLogInfoReport(loggerMock, new ReportLog() { DevicesProcessed = devices.Count, DevicesWithNoPhoneNumber = 1, DevicesWithNoUserEmailAddress = 1, DevicesWithUserEmailAddress = 3, IPads = 1 });
 

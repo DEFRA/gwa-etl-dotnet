@@ -34,7 +34,8 @@ namespace Gwa.Etl
         {
             try
             {
-                logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
+                logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}.");
+                logger.LogInformation($"Next execution will be at {myTimer.ScheduleStatus.Next}");
 
                 AirWatchService getUsers = new(configuration, httpClientFactory, logger);
                 ProcessedUsers processedUsers = await getUsers.Process();
