@@ -68,7 +68,7 @@ namespace Gwa.Etl.Tests
         [Fact]
         public async Task NoDevicesReturnedLogsInformation()
         {
-            AirWatchApiResponse apiResponse = new() { Devices = new List<Device>() };
+            AirWatchApiResponse apiResponse = new() { Devices = new List<Device>(), Page = 0, PageSize = 500, Total = 456 };
             JObject json = (JObject)JToken.FromObject(apiResponse);
             HttpResponseMessage responseMessage = new() { StatusCode = HttpStatusCode.OK, Content = new StringContent(json.ToString()) };
             Mock<HttpMessageHandler> handlerMock = HttpSetup.SetUpHttpMessageHandler(responseMessage, awDomain, awTenantCode);
@@ -81,8 +81,7 @@ namespace Gwa.Etl.Tests
             Verifiers.VerifyLogInfo(loggerMock, $"Last execution was at {timerInfo.ScheduleStatus.Last}. Next execution will be at {timerInfo.ScheduleStatus.Next}");
             Verifiers.VerifyLogInfo(loggerMock, "Request - ");
             Verifiers.VerifyLogInfo(loggerMock, "Response - StatusCode: 200, ReasonPhrase: 'OK', Version: 1.1, Content: System.Net.Http.StringContent");
-            Verifiers.VerifyLogInfo(loggerMock, "DeviceCount: 0");
-            Verifiers.VerifyLogInfo(loggerMock, "Page: 0\nPageSize: 0\nTotal: 0");
+            Verifiers.VerifyLogInfo(loggerMock, $"Page: {apiResponse.Page}. PageSize: {apiResponse.PageSize}. DeviceCountOnPage: {apiResponse.Devices.Count}. TotalDeviceCount: {apiResponse.Total}");
             Verifiers.VerifyLogInfoReport(loggerMock, new ReportLog() { DevicesProcessed = 0, DevicesWithNoPhoneNumber = 0, DevicesWithNoUserEmailAddress = 0, DevicesWithUserEmailAddress = 0, IPads = 0 });
         }
 
@@ -98,7 +97,7 @@ namespace Gwa.Etl.Tests
                 { new Device() { ModelId = new ModelId() { Id = new Id() { Value = 1 } }, PhoneNumber = "+447700111222", UserEmailAddress = "" } },
                 { new Device() { ModelId = new ModelId() { Id = new Id() { Value = 2 } }, PhoneNumber = "+4477004445555", UserEmailAddress = "ipad@gwa.com" } }
             };
-            AirWatchApiResponse apiResponse = new() { Devices = devices };
+            AirWatchApiResponse apiResponse = new() { Devices = devices, Page = 0, PageSize = 500, Total = 123 };
             JObject json = (JObject)JToken.FromObject(apiResponse);
             HttpResponseMessage responseMessage = new() { StatusCode = HttpStatusCode.OK, Content = new StringContent(json.ToString()) };
             Mock<HttpMessageHandler> handlerMock = HttpSetup.SetUpHttpMessageHandler(responseMessage, awDomain, awTenantCode);
@@ -107,6 +106,7 @@ namespace Gwa.Etl.Tests
             ExtractAWData extractAWData = new(blobClientMock.Object, configuration, httpClientFactory, loggerMock.Object);
             await extractAWData.Run(timerInfo);
 
+            Verifiers.VerifyLogInfo(loggerMock, $"Page: {apiResponse.Page}. PageSize: {apiResponse.PageSize}. DeviceCountOnPage: {apiResponse.Devices.Count}. TotalDeviceCount: {apiResponse.Total}");
             Verifiers.VerifyLogInfoReport(loggerMock, new ReportLog() { DevicesProcessed = devices.Count, DevicesWithNoPhoneNumber = 1, DevicesWithNoUserEmailAddress = 1, DevicesWithUserEmailAddress = 3, IPads = 1 });
 
             blobClientMock.Verify(x => x.UploadAsync(It.IsAny<MemoryStream>(), true, It.IsAny<CancellationToken>()));

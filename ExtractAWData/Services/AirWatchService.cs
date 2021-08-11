@@ -126,8 +126,7 @@ namespace Gwa.Etl.Services
                 int PageSize = responseData.PageSize;
                 int Total = responseData.Total;
                 int resDeviceCount = Devices.Count;
-                logger.LogInformation($"DeviceCount: {resDeviceCount}");
-                logger.LogInformation($"Page: {Page}\nPageSize: {PageSize}\nTotal: {Total}");
+                logger.LogInformation($"Page: {Page}. PageSize: {PageSize}. DeviceCountOnPage: {resDeviceCount}. TotalDeviceCount: {Total}");
 
                 for (int i = 0; i < resDeviceCount; i++)
                 {
