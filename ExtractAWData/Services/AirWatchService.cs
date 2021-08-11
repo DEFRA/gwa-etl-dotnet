@@ -16,12 +16,42 @@ namespace Gwa.Etl.Services
         private readonly IConfiguration configuration;
         private readonly HttpClient httpClient;
         private readonly ILogger<ExtractAWData> logger;
+        private readonly int pageSize = 500; // default is 500 prefer to be specific
 
         public AirWatchService(IConfiguration configuration, IHttpClientFactory httpClientFactory, ILogger<ExtractAWData> logger)
         {
             this.configuration = configuration;
             this.logger = logger;
             httpClient = httpClientFactory.CreateClient();
+        }
+
+        private static void AddPhoneNumberToExistingUser(User user, string phoneNumber)
+        {
+            if (!user.PhoneNumbers.Contains(phoneNumber))
+            {
+                user.PhoneNumbers.Add(phoneNumber);
+            }
+        }
+
+        private static void AddUserWithPhoneNumber(IDictionary<string, User> users, User user, string emailAddress, string phoneNumber)
+        {
+            if (user == null)
+            {
+                user = new User { EmailAddress = emailAddress, PhoneNumbers = new List<string> { phoneNumber } };
+                users.Add(emailAddress, user);
+            }
+            else
+            {
+                AddPhoneNumberToExistingUser(user, phoneNumber);
+            }
+        }
+
+        private static void AddUserWithNoPhoneNumber(IDictionary<string, User> users, User user, string emailAddress)
+        {
+            if (user == null)
+            {
+                users.Add(emailAddress, new User { EmailAddress = emailAddress, PhoneNumbers = new List<string>() });
+            }
         }
 
         public async Task<ProcessedUsers> Process()
@@ -32,7 +62,6 @@ namespace Gwa.Etl.Services
             string authorizationHeader = new AuthorizationHeader(certificatePath).GetAuthHeader(baseUri.Path, DateTime.Now);
             string awTenantCode = configuration.GetValue<string>("AW_TENANT_CODE");
 
-            int pageSize = 500; // default is 500 prefer to be specific
             int page = 0; // zero based
             bool morePages;
             int deviceCount = 0;
@@ -86,25 +115,11 @@ namespace Gwa.Etl.Services
                             _ = users.TryGetValue(emailAddress, out User user);
                             if (!string.IsNullOrWhiteSpace(phoneNumber))
                             {
-                                if (user != null)
-                                {
-                                    if (!user.PhoneNumbers.Contains(phoneNumber))
-                                    {
-                                        user.PhoneNumbers.Add(phoneNumber);
-                                    }
-                                }
-                                else
-                                {
-                                    user = new User { EmailAddress = emailAddress, PhoneNumbers = new List<string> { phoneNumber } };
-                                    users.Add(emailAddress, user);
-                                }
+                                AddUserWithPhoneNumber(users, user, emailAddress, phoneNumber);
                             }
                             else
                             {
-                                if (user == null)
-                                {
-                                    users.Add(emailAddress, new User { EmailAddress = emailAddress, PhoneNumbers = new List<string>() });
-                                }
+                                AddUserWithNoPhoneNumber(users, user, emailAddress);
                                 noPhoneNumberCount++;
                             }
                         }
