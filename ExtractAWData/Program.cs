@@ -20,16 +20,8 @@ namespace Gwa.Etl
 
             IHost host = new HostBuilder()
               .ConfigureFunctionsWorkerDefaults()
-              .ConfigureServices(s =>
-              {
-                  _ = s.AddHttpClient();
-                  _ = s.AddSingleton(blobClient);
-              })
-              .ConfigureHostConfiguration(config =>
-              {
-                  _ = config.AddJsonFile("local.settings.json", true, true);
-                  _ = config.AddEnvironmentVariables();
-              })
+              .ConfigureServices(s => { _ = s.AddHttpClient(); _ = s.AddSingleton(blobClient); })
+              .ConfigureHostConfiguration(config => { _ = config.AddJsonFile("local.settings.json", true, true); _ = config.AddEnvironmentVariables(); })
               .Build();
 
             host.Run();
