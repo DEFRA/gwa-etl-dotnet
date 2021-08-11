@@ -54,6 +54,39 @@ namespace Gwa.Etl.Services
             }
         }
 
+        private static int ProcessUserWithEmail(IDictionary<string, User> users, string emailAddress, string phoneNumber)
+        {
+            int noPhoneNumberCount = 0;
+            _ = users.TryGetValue(emailAddress, out User user);
+            if (!string.IsNullOrWhiteSpace(phoneNumber))
+            {
+                AddUserWithPhoneNumber(users, user, emailAddress, phoneNumber);
+            }
+            else
+            {
+                AddUserWithNoPhoneNumber(users, user, emailAddress);
+                noPhoneNumberCount++;
+            }
+            return noPhoneNumberCount;
+        }
+
+        private static Tuple<int, int> ProcessUsers(IDictionary<string, User> users, Device device)
+        {
+            int noPhoneNumberCount = 0;
+            int noEmailCount = 0;
+            string phoneNumber = device.PhoneNumber;
+            string emailAddress = device.UserEmailAddress?.ToLower(new CultureInfo("en-GB"));
+            if (!string.IsNullOrWhiteSpace(emailAddress))
+            {
+                noPhoneNumberCount = ProcessUserWithEmail(users, emailAddress, phoneNumber);
+            }
+            else
+            {
+                noEmailCount++;
+            }
+            return Tuple.Create(noEmailCount, noPhoneNumberCount);
+        }
+
         public async Task<ProcessedUsers> Process()
         {
             string certificatePath = configuration.GetValue<string>("CERTIFICATE_PATH");
@@ -100,33 +133,16 @@ namespace Gwa.Etl.Services
                 {
                     deviceCount++;
                     Device device = Devices[i];
-                    ModelId ModelId = device.ModelId;
-                    string phoneNumber = device.PhoneNumber;
-                    string emailAddress = device.UserEmailAddress?.ToLower(new CultureInfo("en-GB"));
 
-                    if (ModelId.Id.Value == 2)
+                    if (device.ModelId.Id.Value == 2)
                     {
                         iPadCount++;
                     }
                     else
                     {
-                        if (!string.IsNullOrWhiteSpace(emailAddress))
-                        {
-                            _ = users.TryGetValue(emailAddress, out User user);
-                            if (!string.IsNullOrWhiteSpace(phoneNumber))
-                            {
-                                AddUserWithPhoneNumber(users, user, emailAddress, phoneNumber);
-                            }
-                            else
-                            {
-                                AddUserWithNoPhoneNumber(users, user, emailAddress);
-                                noPhoneNumberCount++;
-                            }
-                        }
-                        else
-                        {
-                            noEmailCount++;
-                        }
+                        Tuple<int, int> counts = ProcessUsers(users, device);
+                        noEmailCount += counts.Item1;
+                        noPhoneNumberCount += counts.Item2;
                     }
                 }
                 logger.LogInformation($"Processed {deviceCount} devices.");
