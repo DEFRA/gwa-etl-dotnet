@@ -1,8 +1,9 @@
-using System;
 using Azure.Storage.Blobs;
+using Gwa.Etl.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace Gwa.Etl
 {
@@ -14,9 +15,8 @@ namespace Gwa.Etl
             string dataExtractContainer = Environment.GetEnvironmentVariable("DATA_EXTRACT_CONTAINER", EnvironmentVariableTarget.Process);
             string dataExtractFileName = Environment.GetEnvironmentVariable("DATA_EXTRACT_FILE_NAME", EnvironmentVariableTarget.Process);
 
-            BlobServiceClient serviceClient = new(connectionString);
-            BlobContainerClient containerClient = serviceClient.GetBlobContainerClient(dataExtractContainer);
-            BlobClient blobClient = containerClient.GetBlobClient(dataExtractFileName);
+            AirWatchBlobClientService airWatchBlobClientService = new(connectionString, dataExtractContainer, dataExtractFileName);
+            BlobClient blobClient = airWatchBlobClientService.CreateBlobClient();
 
             IHost host = new HostBuilder()
               .ConfigureFunctionsWorkerDefaults()
