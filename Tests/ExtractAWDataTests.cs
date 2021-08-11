@@ -2,6 +2,7 @@ using Azure.Storage.Blobs;
 using Gwa.Etl.Models;
 using Gwa.Etl.Tests.Helpers;
 using Gwa.Etl.Tests.Models;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -25,7 +26,7 @@ namespace Gwa.Etl.Tests
         private readonly Mock<ILogger<ExtractAWData>> loggerMock = new();
         private readonly string awDomain = "fake.domain";
         private readonly string awTenantCode = "AW_TENANT_CODE";
-        private readonly MyTimerInfo timerInfo;
+        private readonly TimerInfo timerInfo;
 
         public ExtractAWDataTests()
         {
@@ -77,7 +78,7 @@ namespace Gwa.Etl.Tests
             ExtractAWData extractAWData = new(blobClientMock.Object, configuration, httpClientFactory, loggerMock.Object);
             await extractAWData.Run(timerInfo);
 
-            Verifiers.VerifyLogInfo(loggerMock, $"C# Timer trigger function executed at: {timerInfo.ScheduleStatus.LastUpdated}");
+            Verifiers.VerifyLogInfo(loggerMock, $"C# Timer trigger function executed at: ");
             Verifiers.VerifyLogInfo(loggerMock, $"Last execution was at {timerInfo.ScheduleStatus.Last}. Next execution will be at {timerInfo.ScheduleStatus.Next}");
             Verifiers.VerifyLogInfo(loggerMock, "Request - ");
             Verifiers.VerifyLogInfo(loggerMock, "Response - StatusCode: 200, ReasonPhrase: 'OK', Version: 1.1, Content: System.Net.Http.StringContent");
