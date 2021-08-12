@@ -1,12 +1,12 @@
 # GWA ETL .NET
 
-[![Build and Deploy](https://github.com/DEFRA/gwa-etl-dotnet/actions/workflows/build-and-deploy-production.yml/badge.svg)](https://github.com/DEFRA/gwa-etl-dotnet/actions/workflows/build-and-deploy-production.yml)
+[![Build and Deploy](https://github.com/DEFRA/gwa-etl-dotnet/actions/workflows/build-and-deploy.yml/badge.svg)](https://github.com/DEFRA/gwa-etl-dotnet/actions/workflows/build-and-deploy.yml)
+[![Build and Deploy](https://github.com/DEFRA/gwa-etl-dotnet/actions/workflows/build-main.yml/badge.svg)](https://github.com/DEFRA/gwa-etl-dotnet/actions/workflows/build-main.yml)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_gwa-etl-dotnet&metric=coverage)](https://sonarcloud.io/dashboard?id=DEFRA_gwa-etl-dotnet)
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_gwa-etl-dotnet&metric=sqale_index)](https://sonarcloud.io/dashboard?id=DEFRA_gwa-etl-dotnet)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_gwa-etl-dotnet&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=DEFRA_gwa-etl-dotnet)\
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_gwa-etl-dotnet&metric=security_rating)](https://sonarcloud.io/dashboard?id=DEFRA_gwa-etl-dotnet)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=DEFRA_gwa-etl-dotnet&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=DEFRA_gwa-etl-dotnet)
-[![Known Vulnerabilities](https://snyk.io/test/github/defra/gwa-etl-dotnet/badge.svg)](https://snyk.io/test/github/defra/gwa-etl-dotnet)
 
 > An [Azure Function app](https://azure.microsoft.com/en-gb/services/functions/)
 > for retrieving data from AirWatch API.
@@ -21,7 +21,7 @@ a data extract pipeline.
 The app is made up of a single function `ExtractAWData`. The function is
 running on .NET 5.0 using the
 [C# isolated process](https://docs.microsoft.com/en-us/azure/azure-functions/dotnet-isolated-process-guide)
-function.
+function type.
 
 ## Development
 
@@ -36,16 +36,34 @@ The documentation within this repo assumes `CLI tools` are being used and
 the setup has been completed, specifically for
 [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
 
+## Testing
+
+Run the unit tests with the command `dotnet test`, from the root dir that
+would be `dotnet test ./Tests`. The tests can be run continuously using a file
+watcher via `dotnet watch test`, however, for this to work the command must be
+issued from within the `./Tests` dir.
+
 ## Running Locally
 
-To start the function app run `func start`. Once the function is running it can
-be triggered by running [run-function-locally](./scripts/run-function-locally)
-and passing the name of the function i.e.
-`./scripts/run-function-locally ExtractAWData`.
+The function can be started by running `func start` from within
+`./ExtractAWData`. Prior to running the command a valid
+`local.settings.json` must exist in the function dir.
 
 `local.settings.json` will need to contain the relevant secrets for
 the function app to work correctly. Along with the `.p12` certificate file
-with no password must also be available in the repo's root directory.
+with no password must also be available in the function dir.
+
+Once the function is running it can be triggered by running
+[run-function-locally](./scripts/run-function-locally) from the root dir
+and passing the name of the function i.e.
+`./scripts/run-function-locally ExtractAWData`.
+
+*Note:* Scripts are targeted to \*nix environments and use
+[sh](https://en.wikipedia.org/wiki/Bourne_shell) to run.
+
+If there are problems encountered running the app locally, ensure that the
+version of the function CLI tool is up to date and supports running `isolated`
+functions.
 
 ### Pre-requisites
 

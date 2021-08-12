@@ -38,6 +38,9 @@ bld/
 *.VisualState.xml
 TestResult.xml
 
+# dotCover
+dotCover.*
+
 # Build Results of an ATL Project
 [Dd]ebugPS/
 [Rr]eleasePS/
@@ -201,6 +204,8 @@ app-settings.json
 *.publishsettings
 node_modules/
 orleans.codegen.cs
+.sonar*
+.DS_Store
 
 # Since there are multiple workflows, uncomment next line to ignore bower_components
 # (https://github.com/github/gitignore/pull/1529#issuecomment-104372622)
