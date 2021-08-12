@@ -58,6 +58,9 @@ Once the function is running it can be triggered by running
 and passing the name of the function i.e.
 `./scripts/run-function-locally ExtractAWData`.
 
+*Note:* Scripts are targeted to \*nix environments and use
+[sh](https://en.wikipedia.org/wiki/Bourne_shell) to run.
+
 If there are problems encountered running the app locally, ensure that the
 version of the function CLI tool is up to date and supports running `isolated`
 functions.

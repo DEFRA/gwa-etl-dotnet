@@ -2,6 +2,9 @@
 
 > A collection of useful scripts.
 
+*Note:* Scripts are targeted to \*nix environments and use
+[sh](https://en.wikipedia.org/wiki/Bourne_shell) to run.
+
 ## [Run function locally](./run-function-locally)
 
 Run the function locally by sending an HTTP POST request. The function
